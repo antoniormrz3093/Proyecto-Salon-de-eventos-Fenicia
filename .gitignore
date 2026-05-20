@@ -1,0 +1,33 @@
+# Google Drive metadata
+desktop.ini
+**/desktop.ini
+
+# DB backups — grandes, no van a git
+backups/*.bak
+backups/*.BAK
+
+# Excels generados (re-creables desde scripts)
+salidas/*.xlsx
+salidas/*.xlsm
+salidas/~$*
+
+# Snapshots de diff y salidas temporales de scripts (re-creables)
+scripts/snapshots/
+scripts/_*.txt
+
+# Bitácoras (descomenta si decides NO versionarlas)
+# bitacora/*.xlsx
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+
+# Claude Code local config (permisos por máquina, no portable)
+.claude/

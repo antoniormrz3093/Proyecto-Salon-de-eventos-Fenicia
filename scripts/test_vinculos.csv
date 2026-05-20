@@ -1,0 +1,4 @@
+Id,FechaInicio,Modo,DiasCalendario,UEjecutoras,PredId,TipoVinc,LagDias
+852006,2026-06-01,DUR,6,,,,
+852005,,DUR,4,,852006,FS,0
+1802248,,DUR,3,,852005,FS,2
