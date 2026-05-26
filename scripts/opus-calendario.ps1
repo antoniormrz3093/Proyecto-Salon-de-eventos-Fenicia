@@ -12,8 +12,9 @@ param(
   [string]$Desde="2026-05-25",
   [string]$Hasta="2026-12-31",
   [string[]]$Festivos=@("2026-09-16","2026-11-16","2026-12-25"),
-  [int]$IdMedioSabado=2195456,   # Rango con 08-12h
-  [int]$IdVacio=2195461,         # Rango vacio (no laborable)
+  [int]$IdMedioSabado=2195456,   # Rango con 08-12h (en PlantillaDb)
+  [int]$IdVacio=2195461,         # Rango vacio / no laborable (en PlantillaDb)
+  [string]$PlantillaDb="",        # BD de donde leer los blobs plantilla (default = Database)
   [string]$Server="(localdb)\OpusLocal",
   [switch]$WhatIf
 )
@@ -22,8 +23,16 @@ function Cn($db){ $c=New-Object System.Data.SqlClient.SqlConnection "Server=$Ser
 
 $cn=Cn $Database
 function Scalar($q){ $c=$cn.CreateCommand(); $c.CommandText=$q; $c.ExecuteScalar() }
-$blobHalf=[byte[]](Scalar "SELECT HorariosDeTrabajo FROM UnidadDeTrabajo WHERE UnidadDeTrabajoId=$IdMedioSabado")
-$blobEmpty=[byte[]](Scalar "SELECT HorariosDeTrabajo FROM UnidadDeTrabajo WHERE UnidadDeTrabajoId=$IdVacio")
+# blobs plantilla: leer de PlantillaDb si se indica (p.ej. replicar calendario de la copia a la 110)
+if($PlantillaDb -and $PlantillaDb -ne $Database){
+  $cpl=Cn $PlantillaDb; $cm=$cpl.CreateCommand()
+  $cm.CommandText="SELECT HorariosDeTrabajo FROM UnidadDeTrabajo WHERE UnidadDeTrabajoId=$IdMedioSabado"; $blobHalf=[byte[]]$cm.ExecuteScalar()
+  $cm.CommandText="SELECT HorariosDeTrabajo FROM UnidadDeTrabajo WHERE UnidadDeTrabajoId=$IdVacio"; $blobEmpty=[byte[]]$cm.ExecuteScalar()
+  $cpl.Close()
+} else {
+  $blobHalf=[byte[]](Scalar "SELECT HorariosDeTrabajo FROM UnidadDeTrabajo WHERE UnidadDeTrabajoId=$IdMedioSabado")
+  $blobEmpty=[byte[]](Scalar "SELECT HorariosDeTrabajo FROM UnidadDeTrabajo WHERE UnidadDeTrabajoId=$IdVacio")
+}
 $calId=[int](Scalar "SELECT TOP 1 CalendarioId FROM Calendario")
 # fechas Rango ya existentes
 $existing=@{}; $c=$cn.CreateCommand(); $c.CommandText="SELECT CONVERT(varchar(10),FechaInicio,120) FROM UnidadDeTrabajo WHERE TipoUnidad='Rango' AND FechaInicio IS NOT NULL"

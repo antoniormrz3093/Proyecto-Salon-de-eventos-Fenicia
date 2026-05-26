@@ -10,6 +10,7 @@ backups/*.BAK
 salidas/*.xlsx
 salidas/*.xlsm
 salidas/~$*
+salidas/_*.txt
 
 # Snapshots de diff y salidas temporales de scripts (re-creables)
 scripts/snapshots/
